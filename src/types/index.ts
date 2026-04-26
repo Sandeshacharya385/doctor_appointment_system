@@ -9,6 +9,15 @@ export interface User {
   profile_picture?: string;
 }
 
+export interface DoctorAvailability {
+  id: number;
+  day_of_week: number;
+  day_name: string;
+  start_time: string;
+  end_time: string;
+  is_active: boolean;
+}
+
 export interface Doctor {
   id: number;
   user: User;
@@ -21,13 +30,23 @@ export interface Doctor {
   availability: DoctorAvailability[];
 }
 
-export interface DoctorAvailability {
+export interface Medicine {
+  id?: number;
+  name: string;
+  dosage: string;
+  frequency: string;
+  frequency_display?: string;
+  duration_days: number;
+  timing_notes: string;
+}
+
+export interface Prescription {
   id: number;
-  day_of_week: number;
-  day_name: string;
-  start_time: string;
-  end_time: string;
-  is_active: boolean;
+  appointment: number;
+  diagnosis: string;
+  instructions: string;
+  medicines: Medicine[];
+  created_at: string;
 }
 
 export interface Appointment {
@@ -40,7 +59,13 @@ export interface Appointment {
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   reason: string;
   notes?: string;
+  prescription?: Prescription;
   created_at: string;
+}
+
+export interface TimeSlot {
+  time: string;
+  available: boolean;
 }
 
 export interface AuthTokens {

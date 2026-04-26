@@ -33,6 +33,10 @@ const config = {
           foreground: "hsl(var(--secondary-foreground))",
         },
       },
+      fontFamily: {
+        inter: ["Inter", "sans-serif"],
+        manrope: ["Manrope", "sans-serif"],
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],
