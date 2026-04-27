@@ -429,3 +429,102 @@ export default function DoctorPage() {
           </div>
         </div>
       )}
+
+      {/* Prescription Modal */}
+      {rx && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-center sticky top-0 bg-white z-10">
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">Write Prescription</h3>
+                <p className="text-sm text-slate-500">{rx.patient?.first_name} {rx.patient?.last_name} &bull; {rx.appointment_date}</p>
+              </div>
+              <button onClick={() => setRx(null)} className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full font-bold text-lg">x</button>
+            </div>
+            <div className="p-6 space-y-5">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">Diagnosis *</label>
+                <textarea value={diag} onChange={e => setDiag(e.target.value)} rows={2}
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                  placeholder="Patient diagnosis..." />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">General Instructions</label>
+                <textarea value={instr} onChange={e => setInstr(e.target.value)} rows={2}
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                  placeholder="Rest, diet, follow-up instructions..." />
+              </div>
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-xs font-semibold text-slate-600">Medicines and Timetable</label>
+                  <button onClick={() => setMeds(p => [...p, blank()])}
+                    className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-bold hover:bg-blue-100 transition-all">
+                    + Add Medicine
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  {meds.map((med, i) => (
+                    <div key={i} className="border border-slate-200 rounded-xl p-4 space-y-3 bg-slate-50">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-700">Medicine {i + 1}</span>
+                        {meds.length > 1 && (
+                          <button onClick={() => setMeds(p => p.filter((_, idx) => idx !== i))}
+                            className="text-xs text-red-500 hover:text-red-700 font-bold">Remove</button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-1">Medicine Name *</label>
+                          <input value={med.name} onChange={e => updMed(i, 'name', e.target.value)}
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                            placeholder="e.g. Paracetamol 500mg" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-1">Dosage *</label>
+                          <input value={med.dosage} onChange={e => updMed(i, 'dosage', e.target.value)}
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                            placeholder="e.g. 1 tablet" />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-1">Frequency *</label>
+                          <select value={med.frequency} onChange={e => updMed(i, 'frequency', e.target.value)}
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white">
+                            {FREQS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-slate-500 mb-1">Duration (days) *</label>
+                          <input type="number" value={med.duration_days} onChange={e => updMed(i, 'duration_days', +e.target.value)} min={1}
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[10px] font-semibold text-slate-500 mb-1">Timing Notes</label>
+                        <input value={med.timing_notes} onChange={e => updMed(i, 'timing_notes', e.target.value)}
+                          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                          placeholder="e.g. Take with warm water after breakfast" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              {rxMsg && (
+                <p className={`text-sm font-medium ${rxMsg.includes('saved') ? 'text-emerald-600' : 'text-red-500'}`}>{rxMsg}</p>
+              )}
+              <div className="flex space-x-3 pt-2">
+                <button onClick={() => setRx(null)}
+                  className="flex-1 border border-slate-200 text-slate-600 py-2.5 rounded-xl font-semibold text-sm hover:bg-slate-50 transition-all">
+                  Cancel
+                </button>
+                <button onClick={saveRx} disabled={rxSaving || !diag}
+                  className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 disabled:opacity-60 transition-all">
+                  {rxSaving ? 'Saving...' : 'Save Prescription'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
