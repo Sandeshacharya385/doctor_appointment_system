@@ -8,10 +8,10 @@ import { Appointment } from '@/types';
 import { format } from 'date-fns';
 
 const statusBadge: Record<string, string> = {
-  confirmed: 'bg-emerald-100 text-emerald-700',
-  pending:   'bg-amber-100 text-amber-700',
+  confirmed: 'bg-gray-100 text-gray-700',
+  pending:   'bg-gray-100 text-gray-700',
   cancelled: 'bg-slate-200 text-slate-600',
-  completed: 'bg-blue-100 text-blue-700',
+  completed: 'bg-gray-100 text-gray-700',
 };
 
 export default function AppointmentsPage() {
@@ -50,7 +50,7 @@ export default function AppointmentsPage() {
         </div>
         {user?.role === 'patient' && (
           <Link href="/doctors">
-            <button className="bg-blue-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-blue-700 transition-all flex items-center space-x-2 shadow-lg shadow-blue-200">
+            <button className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-gray-800 transition-all flex items-center space-x-2 shadow-lg shadow-gray-200">
               <span className="material-symbols-outlined text-[18px]">add</span>
               <span>Book Appointment</span>
             </button>
@@ -63,7 +63,7 @@ export default function AppointmentsPage() {
         {['all','pending','confirmed','completed','cancelled'].map(s => (
           <button key={s} onClick={() => setFilter(s)}
             className={`px-4 py-1.5 rounded-full text-xs font-bold capitalize transition-all ${
-              filter === s ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-300'
+              filter === s ? 'bg-gray-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-gray-300'
             }`}>
             {s} {s !== 'all' && `(${appointments.filter(a => a.status === s).length})`}
           </button>
@@ -75,7 +75,7 @@ export default function AppointmentsPage() {
           <span className="material-symbols-outlined text-[56px] text-slate-300 mb-4 block">event_busy</span>
           <p className="text-slate-500 font-medium">No {filter !== 'all' ? filter : ''} appointments</p>
           {user?.role === 'patient' && (
-            <Link href="/doctors" className="mt-3 inline-block text-blue-600 text-sm font-semibold hover:underline">
+            <Link href="/doctors" className="mt-3 inline-block text-gray-900 text-sm font-semibold hover:underline">
               Book your first appointment →
             </Link>
           )}
@@ -86,7 +86,7 @@ export default function AppointmentsPage() {
             <div key={appt.id} className="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-slate-50 p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center font-bold text-lg flex-shrink-0">
                     {user?.role === 'patient'
                       ? (appt.doctor_details?.user?.first_name?.[0] || 'D')
                       : (appt.patient?.first_name?.[0] || 'P')}
@@ -131,7 +131,7 @@ export default function AppointmentsPage() {
                     <div className="flex space-x-2">
                       {appt.status === 'completed' && appt.prescription && (
                         <Link href="/prescriptions">
-                          <button className="text-xs bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg font-semibold hover:bg-blue-100 transition-all flex items-center space-x-1">
+                          <button className="text-xs bg-gray-50 text-gray-700 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-100 transition-all flex items-center space-x-1">
                             <span className="material-symbols-outlined text-[14px]">medication</span>
                             <span>View Prescription</span>
                           </button>
@@ -145,7 +145,7 @@ export default function AppointmentsPage() {
                       )}
                       {appt.status === 'completed' && (
                         <Link href={`/appointments/book?doctor=${appt.doctor}`}>
-                          <button className="text-xs bg-emerald-50 text-emerald-700 px-3 py-1.5 rounded-lg font-semibold hover:bg-emerald-100 transition-all">
+                          <button className="text-xs bg-emerald-50 text-gray-700 px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-100 transition-all">
                             Follow-up
                           </button>
                         </Link>
@@ -159,10 +159,10 @@ export default function AppointmentsPage() {
               {user?.role === 'patient' && appt.prescription && (
                 <div className="mt-4 pt-4 border-t border-slate-100">
                   <div className="flex items-center space-x-2 mb-3">
-                    <span className="material-symbols-outlined text-blue-600 text-[18px]">medication</span>
+                    <span className="material-symbols-outlined text-gray-900 text-[18px]">medication</span>
                     <p className="text-sm font-semibold text-slate-700">Prescription</p>
                   </div>
-                  <div className="bg-blue-50 rounded-xl p-4">
+                  <div className="bg-gray-50 rounded-xl p-4">
                     <p className="text-xs font-semibold text-slate-600 mb-1">Diagnosis</p>
                     <p className="text-sm text-slate-800">{appt.prescription.diagnosis}</p>
                     {appt.prescription.medicines.length > 0 && (
@@ -184,3 +184,4 @@ export default function AppointmentsPage() {
     </div>
   );
 }
+

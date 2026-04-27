@@ -18,10 +18,10 @@ const FREQS = [
   { value: 'as_needed',         label: 'As Needed' },
 ];
 const SB: Record<string, string> = {
-  confirmed: 'bg-emerald-100 text-emerald-700',
-  pending:   'bg-amber-100 text-amber-700',
+  confirmed: 'bg-gray-100 text-gray-700',
+  pending:   'bg-gray-100 text-gray-700',
   cancelled: 'bg-slate-200 text-slate-600',
-  completed: 'bg-blue-100 text-blue-700',
+  completed: 'bg-gray-100 text-gray-700',
 };
 
 interface HistEntry {
@@ -143,7 +143,7 @@ export default function DoctorPage() {
           <h2 className="text-2xl font-bold text-slate-900">Doctor Panel</h2>
           <p className="text-sm text-slate-500 mt-1">Dr. {user?.first_name} {user?.last_name}</p>
         </div>
-        <span className={`text-xs font-bold px-3 py-1 rounded-full ${avail ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-600'}`}>
+        <span className={`text-xs font-bold px-3 py-1 rounded-full ${avail ? 'bg-gray-100 text-gray-700' : 'bg-slate-200 text-slate-600'}`}>
           {avail ? 'Available' : 'Unavailable'}
         </span>
       </div>
@@ -151,7 +151,7 @@ export default function DoctorPage() {
       <div className="flex space-x-1 bg-slate-100 p-1 rounded-xl w-fit">
         {(['appointments','schedule','profile'] as Tab[]).map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={`px-5 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${tab === t ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>
+            className={`px-5 py-2 rounded-lg text-sm font-semibold capitalize transition-all ${tab === t ? 'bg-white text-gray-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'}`}>
             {t}
           </button>
         ))}
@@ -162,7 +162,7 @@ export default function DoctorPage() {
           <div className="flex space-x-2 flex-wrap gap-y-2">
             {['all','pending','confirmed','completed','cancelled'].map(s => (
               <button key={s} onClick={() => setFilter(s)}
-                className={`px-4 py-1.5 rounded-full text-xs font-bold capitalize transition-all ${filter === s ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-blue-300'}`}>
+                className={`px-4 py-1.5 rounded-full text-xs font-bold capitalize transition-all ${filter === s ? 'bg-gray-900 text-white' : 'bg-white text-slate-600 border border-slate-200 hover:border-gray-300'}`}>
                 {s} {s !== 'all' && `(${appointments.filter(a => a.status === s).length})`}
               </button>
             ))}
@@ -178,7 +178,7 @@ export default function DoctorPage() {
             <div key={appt.id} className="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-slate-50 p-6">
               <div className="flex items-start justify-between">
                 <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center font-bold text-lg flex-shrink-0">
                     {appt.patient?.first_name?.[0] || 'P'}
                   </div>
                   <div>
@@ -196,7 +196,7 @@ export default function DoctorPage() {
                     </div>
                     <p className="text-xs text-slate-500 mt-1">Reason: {appt.reason}</p>
                     {appt.prescription && (
-                      <span className="inline-flex items-center space-x-1 mt-2 text-[10px] bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-bold">
+                      <span className="inline-flex items-center space-x-1 mt-2 text-[10px] bg-gray-50 text-gray-700 px-2 py-0.5 rounded-full font-bold">
                         <span className="material-symbols-outlined text-[12px]">medication</span>
                         <span>Prescription given</span>
                       </span>
@@ -213,7 +213,7 @@ export default function DoctorPage() {
                     </button>
                     {appt.status === 'pending' && (
                       <button onClick={() => setStatus(appt.id, 'confirmed')}
-                        className="text-xs bg-emerald-500 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-emerald-600 transition-all">Confirm</button>
+                        className="text-xs bg-gray-500 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-800 transition-all">Confirm</button>
                     )}
                     {(appt.status === 'pending' || appt.status === 'confirmed') && (
                       <button onClick={() => setStatus(appt.id, 'cancelled')}
@@ -221,7 +221,7 @@ export default function DoctorPage() {
                     )}
                     {appt.status === 'confirmed' && (
                       <button onClick={() => openRx(appt)}
-                        className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-blue-700 transition-all flex items-center space-x-1">
+                        className="text-xs bg-gray-900 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-gray-800 transition-all flex items-center space-x-1">
                         <span className="material-symbols-outlined text-[14px]">medication</span>
                         <span>Prescribe</span>
                       </button>
@@ -246,7 +246,7 @@ export default function DoctorPage() {
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1">Day of Week</label>
                 <select value={newSlot.day_of_week} onChange={e => setNewSlot(p => ({ ...p, day_of_week: +e.target.value }))}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200">
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200">
                   {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
                 </select>
               </div>
@@ -254,16 +254,16 @@ export default function DoctorPage() {
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">Start Time</label>
                   <input type="time" value={newSlot.start_time} onChange={e => setNewSlot(p => ({ ...p, start_time: e.target.value }))}
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">End Time</label>
                   <input type="time" value={newSlot.end_time} onChange={e => setNewSlot(p => ({ ...p, end_time: e.target.value }))}
-                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" />
+                    className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" />
                 </div>
               </div>
-              {slotMsg && <p className={`text-xs font-medium ${slotMsg.includes('!') ? 'text-emerald-600' : 'text-red-500'}`}>{slotMsg}</p>}
-              <button onClick={addSlot} className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-all">Add Slot</button>
+              {slotMsg && <p className={`text-xs font-medium ${slotMsg.includes('!') ? 'text-gray-600' : 'text-red-500'}`}>{slotMsg}</p>}
+              <button onClick={addSlot} className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all">Add Slot</button>
             </div>
           </div>
           <div className="bg-white rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] border border-slate-50 p-6">
@@ -273,14 +273,14 @@ export default function DoctorPage() {
             ) : (
               <div className="space-y-3">
                 {slots.map(slot => (
-                  <div key={slot.id} className={`flex items-center justify-between p-3 rounded-lg border ${slot.is_active ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-slate-50 opacity-60'}`}>
+                  <div key={slot.id} className={`flex items-center justify-between p-3 rounded-lg border ${slot.is_active ? 'border-gray-200 bg-gray-50' : 'border-slate-200 bg-slate-50 opacity-60'}`}>
                     <div>
                       <p className="text-sm font-semibold text-slate-900">{slot.day_name}</p>
                       <p className="text-xs text-slate-500">{slot.start_time} to {slot.end_time}</p>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button onClick={() => togSlot(slot)}
-                        className={`text-xs px-3 py-1 rounded-full font-bold transition-all ${slot.is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}>
+                        className={`text-xs px-3 py-1 rounded-full font-bold transition-all ${slot.is_active ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-slate-200 text-slate-600 hover:bg-slate-300'}`}>
                         {slot.is_active ? 'Active' : 'Inactive'}
                       </button>
                       <button onClick={() => delSlot(slot.id)} className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full font-bold hover:bg-red-200 transition-all">Remove</button>
@@ -299,24 +299,24 @@ export default function DoctorPage() {
             <h3 className="text-lg font-semibold text-slate-900">Update Profile</h3>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Specialization</label>
-              <input value={spec} onChange={e => setSpec(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="e.g. Cardiologist" />
+              <input value={spec} onChange={e => setSpec(e.target.value)} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" placeholder="e.g. Cardiologist" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Consultation Fee ($)</label>
-              <input type="number" value={fee} onChange={e => setFee(e.target.value)} min="0" step="0.01" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200" placeholder="e.g. 150.00" />
+              <input type="number" value={fee} onChange={e => setFee(e.target.value)} min="0" step="0.01" className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200" placeholder="e.g. 150.00" />
             </div>
             <div>
               <label className="block text-xs font-semibold text-slate-600 mb-1">Bio</label>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={4} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none" placeholder="Tell patients about yourself..." />
+              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={4} className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 resize-none" placeholder="Tell patients about yourself..." />
             </div>
             <div className="flex items-center space-x-3">
-              <button onClick={() => setAvail(!avail)} className={`relative w-12 h-6 rounded-full transition-all flex-shrink-0 ${avail ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+              <button onClick={() => setAvail(!avail)} className={`relative w-12 h-6 rounded-full transition-all flex-shrink-0 ${avail ? 'bg-gray-500' : 'bg-slate-300'}`}>
                 <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all ${avail ? 'left-7' : 'left-1'}`} />
               </button>
               <span className="text-sm font-medium text-slate-700">{avail ? 'Available for appointments' : 'Not accepting appointments'}</span>
             </div>
-            {profMsg && <p className={`text-xs font-medium ${profMsg.includes('!') ? 'text-emerald-600' : 'text-red-500'}`}>{profMsg}</p>}
-            <button onClick={saveProf} className="w-full bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 transition-all">Save Changes</button>
+            {profMsg && <p className={`text-xs font-medium ${profMsg.includes('!') ? 'text-gray-600' : 'text-red-500'}`}>{profMsg}</p>}
+            <button onClick={saveProf} className="w-full bg-gray-900 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all">Save Changes</button>
           </div>
         </div>
       )}
@@ -338,14 +338,14 @@ export default function DoctorPage() {
               ) : hist ? (
                 <div className="space-y-6">
                   <div className="bg-slate-50 rounded-xl p-4 flex items-center space-x-4">
-                    <div className="w-14 h-14 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xl flex-shrink-0">{hist.patient.name[0]}</div>
+                    <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center font-bold text-xl flex-shrink-0">{hist.patient.name[0]}</div>
                     <div className="flex-1">
                       <p className="font-bold text-slate-900 text-lg">{hist.patient.name}</p>
                       <p className="text-sm text-slate-500">{hist.patient.email}</p>
                       {hist.patient.phone && <p className="text-sm text-slate-500">{hist.patient.phone}</p>}
                     </div>
                     <div className="text-right">
-                      <p className="text-3xl font-bold text-blue-600">{hist.total_visits}</p>
+                      <p className="text-3xl font-bold text-gray-900">{hist.total_visits}</p>
                       <p className="text-xs text-slate-500">Total Visits</p>
                     </div>
                   </div>
@@ -353,17 +353,17 @@ export default function DoctorPage() {
                     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Visit Timeline (newest first)</p>
                     <div className="space-y-4">
                       {hist.history.map((entry, idx) => (
-                        <div key={entry.id} className={`rounded-xl border p-5 ${entry.is_followup ? 'border-purple-200 bg-purple-50' : 'border-slate-200 bg-white'}`}>
+                        <div key={entry.id} className={`rounded-xl border p-5 ${entry.is_followup ? 'border-gray-200 bg-gray-50' : 'border-slate-200 bg-white'}`}>
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center space-x-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${entry.is_followup ? 'bg-purple-200 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${entry.is_followup ? 'bg-gray-200 text-gray-700' : 'bg-gray-100 text-gray-700'}`}>
                                 {hist.total_visits - idx}
                               </div>
                               <div>
                                 <div className="flex items-center space-x-2 flex-wrap gap-y-1">
                                   <p className="font-semibold text-slate-900 text-sm">{entry.appointment_date}</p>
                                   <span className="text-slate-400 text-xs">{entry.appointment_time?.slice(0, 5)}</span>
-                                  {entry.is_followup && <span className="text-[10px] bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold">Follow-up</span>}
+                                  {entry.is_followup && <span className="text-[10px] bg-purple-100 text-gray-700 px-2 py-0.5 rounded-full font-bold">Follow-up</span>}
                                 </div>
                                 <p className="text-xs text-slate-500">{entry.doctor_name} &bull; {entry.specialization}</p>
                               </div>
@@ -384,7 +384,7 @@ export default function DoctorPage() {
                             {entry.prescription && (
                               <div className="bg-white rounded-lg border border-slate-200 p-4 space-y-3">
                                 <div className="flex items-center space-x-2">
-                                  <span className="material-symbols-outlined text-blue-600 text-[18px]">medication</span>
+                                  <span className="material-symbols-outlined text-gray-900 text-[18px]">medication</span>
                                   <p className="text-sm font-semibold text-slate-800">Prescription</p>
                                 </div>
                                 <div>
@@ -408,7 +408,7 @@ export default function DoctorPage() {
                                             <p className="text-xs text-slate-500">{med.dosage}{med.timing_notes ? ` — ${med.timing_notes}` : ''}</p>
                                           </div>
                                           <div className="text-right">
-                                            <p className="text-xs font-bold text-blue-700">{med.frequency_display || med.frequency}</p>
+                                            <p className="text-xs font-bold text-gray-700">{med.frequency_display || med.frequency}</p>
                                             <p className="text-[10px] text-slate-400">{med.duration_days} days</p>
                                           </div>
                                         </div>
@@ -445,20 +445,20 @@ export default function DoctorPage() {
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1">Diagnosis *</label>
                 <textarea value={diag} onChange={e => setDiag(e.target.value)} rows={2}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 resize-none"
                   placeholder="Patient diagnosis..." />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-slate-600 mb-1">General Instructions</label>
                 <textarea value={instr} onChange={e => setInstr(e.target.value)} rows={2}
-                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 resize-none"
+                  className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 resize-none"
                   placeholder="Rest, diet, follow-up instructions..." />
               </div>
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="text-xs font-semibold text-slate-600">Medicines and Timetable</label>
                   <button onClick={() => setMeds(p => [...p, blank()])}
-                    className="text-xs bg-blue-50 text-blue-600 px-3 py-1 rounded-full font-bold hover:bg-blue-100 transition-all">
+                    className="text-xs bg-gray-50 text-gray-900 px-3 py-1 rounded-full font-bold hover:bg-gray-100 transition-all">
                     + Add Medicine
                   </button>
                 </div>
@@ -476,32 +476,32 @@ export default function DoctorPage() {
                         <div>
                           <label className="block text-[10px] font-semibold text-slate-500 mb-1">Medicine Name *</label>
                           <input value={med.name} onChange={e => updMed(i, 'name', e.target.value)}
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 bg-white"
                             placeholder="e.g. Paracetamol 500mg" />
                         </div>
                         <div>
                           <label className="block text-[10px] font-semibold text-slate-500 mb-1">Dosage *</label>
                           <input value={med.dosage} onChange={e => updMed(i, 'dosage', e.target.value)}
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 bg-white"
                             placeholder="e.g. 1 tablet" />
                         </div>
                         <div>
                           <label className="block text-[10px] font-semibold text-slate-500 mb-1">Frequency *</label>
                           <select value={med.frequency} onChange={e => updMed(i, 'frequency', e.target.value)}
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white">
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 bg-white">
                             {FREQS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
                           </select>
                         </div>
                         <div>
                           <label className="block text-[10px] font-semibold text-slate-500 mb-1">Duration (days) *</label>
                           <input type="number" value={med.duration_days} onChange={e => updMed(i, 'duration_days', +e.target.value)} min={1}
-                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white" />
+                            className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 bg-white" />
                         </div>
                       </div>
                       <div>
                         <label className="block text-[10px] font-semibold text-slate-500 mb-1">Timing Notes</label>
                         <input value={med.timing_notes} onChange={e => updMed(i, 'timing_notes', e.target.value)}
-                          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200 bg-white"
+                          className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-200 bg-white"
                           placeholder="e.g. Take with warm water after breakfast" />
                       </div>
                     </div>
@@ -509,7 +509,7 @@ export default function DoctorPage() {
                 </div>
               </div>
               {rxMsg && (
-                <p className={`text-sm font-medium ${rxMsg.includes('saved') ? 'text-emerald-600' : 'text-red-500'}`}>{rxMsg}</p>
+                <p className={`text-sm font-medium ${rxMsg.includes('saved') ? 'text-gray-600' : 'text-red-500'}`}>{rxMsg}</p>
               )}
               <div className="flex space-x-3 pt-2">
                 <button onClick={() => setRx(null)}
@@ -517,7 +517,7 @@ export default function DoctorPage() {
                   Cancel
                 </button>
                 <button onClick={saveRx} disabled={rxSaving || !diag}
-                  className="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-blue-700 disabled:opacity-60 transition-all">
+                  className="flex-1 bg-gray-900 text-white py-2.5 rounded-xl font-semibold text-sm hover:bg-gray-800 disabled:opacity-60 transition-all">
                   {rxSaving ? 'Saving...' : 'Save Prescription'}
                 </button>
               </div>
@@ -528,3 +528,4 @@ export default function DoctorPage() {
     </div>
   );
 }
+
