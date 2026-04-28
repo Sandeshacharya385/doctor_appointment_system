@@ -22,8 +22,11 @@ export default function DashboardPage() {
         ]);
         setAppointments(apptRes.data.results || apptRes.data);
         setDoctors(docRes.data.results || docRes.data);
-      } catch (e) {
-        console.error(e);
+      } catch (e: any) {
+        console.error('Dashboard fetch error:', e);
+        if (e.response?.status === 403) {
+          console.error('403 Forbidden - Check user permissions and authentication token');
+        }
       } finally {
         setLoading(false);
       }

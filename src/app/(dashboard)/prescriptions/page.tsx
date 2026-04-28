@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { useAuthStore } from '@/store/authStore';
 import { Prescription } from '@/types';
 
 interface PrescriptionWithMeta extends Prescription {
@@ -18,21 +19,49 @@ const FREQ_LABEL: Record<string, string> = {
 };
 
 export default function PrescriptionsPage() {
+  const { user } = useAuthStore();
   const [prescriptions, setPrescriptions] = useState<PrescriptionWithMeta[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
+    // Only patients can access this page
+    if (user?.role !== 'patient') {
+      setError('This page is only accessible to patients. Doctors can view prescriptions from the appointments page.');
+      setLoading(false);
+      return;
+    }
+
     api.get('/appointments/my-prescriptions/')
       .then(r => setPrescriptions(r.data))
-      .catch(console.error)
+      .catch((err) => {
+        console.error('Failed to load prescriptions:', err);
+        setError('Failed to load prescriptions. Please try again later.');
+      })
       .finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-slate-400 text-sm">Loading prescriptions...</p>
+        <p className="text-gray-400 text-sm">Loading prescriptions...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6 max-w-3xl">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">My Prescriptions</h2>
+          <p className="text-sm text-gray-500 mt-1">Prescriptions from your completed appointments</p>
+        </div>
+        <div className="bg-white rounded-xl border border-gray-200 p-16 text-center shadow-sm">
+          <span className="material-symbols-outlined text-[56px] text-red-300 mb-4 block">error</span>
+          <p className="text-gray-900 font-medium mb-2">Access Restricted</p>
+          <p className="text-gray-500 text-sm">{error}</p>
+        </div>
       </div>
     );
   }

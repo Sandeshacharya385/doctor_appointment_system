@@ -14,7 +14,7 @@ const ROUTE_ROLES: Record<string, string[]> = {
   '/doctor': ['doctor'],
   '/appointments': ['patient', 'doctor', 'admin'],
   '/doctors': ['patient', 'admin'],
-  '/payments': ['patient'],
+  '/payments': ['patient', 'admin'],
   '/prescriptions': ['patient'],
   '/admin': ['admin'],
   '/profile': ['patient', 'doctor', 'admin'],
