@@ -100,11 +100,11 @@ export default function ProfilePage() {
   return (
     <div className="max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Profile Settings</h1>
-        <p className="text-sm text-gray-500 mt-1">Manage your account information and preferences</p>
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Profile Settings</h1>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your account information and preferences</p>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
         <div className="space-y-6">
           {/* Profile Picture */}
           <div className="flex items-center space-x-4">
@@ -116,7 +116,7 @@ export default function ProfilePage() {
                   className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-2xl">
+                <div className="w-20 h-20 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-700 dark:text-gray-300 font-semibold text-2xl">
                   {formData.first_name?.[0]?.toUpperCase() || user?.username?.[0]?.toUpperCase() || 'U'}
                 </div>
               )}
@@ -129,11 +129,11 @@ export default function ProfilePage() {
               />
             </div>
             <div>
-              <h3 className="font-medium text-gray-900">Profile Picture</h3>
-              <p className="text-sm text-gray-500">JPG, PNG or GIF (max 5MB)</p>
+              <h3 className="font-medium text-gray-900 dark:text-gray-100">Profile Picture</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">JPG, PNG or GIF (max 5MB)</p>
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="mt-2 px-4 py-2 text-sm bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
+                className="mt-2 px-4 py-2 text-sm bg-gray-900 dark:bg-gray-800 text-white rounded-lg hover:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 border border-gray-800 dark:border-gray-700 font-semibold"
               >
                 {profileImage ? 'Change Photo' : 'Upload Photo'}
               </button>
@@ -144,7 +144,7 @@ export default function ProfilePage() {
                     setImageFile(null);
                     if (fileInputRef.current) fileInputRef.current.value = '';
                   }}
-                  className="mt-2 ml-2 px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="mt-2 ml-2 px-4 py-2 text-sm border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 font-semibold"
                 >
                   Remove
                 </button>
@@ -152,71 +152,71 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="font-medium text-gray-900 mb-4">Personal Information</h3>
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-6">
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Personal Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
                 <input
                   type="text"
                   value={formData.first_name}
                   onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   placeholder="Enter first name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
                 <input
                   type="text"
                   value={formData.last_name}
                   onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   placeholder="Enter last name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   placeholder="Enter email"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                   placeholder="Enter phone number"
                 />
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="font-medium text-gray-900 mb-4">Account Details</h3>
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-6">
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-4">Account Details</h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Username</p>
-                  <p className="text-sm text-gray-500">{user?.username}</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Username</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{user?.username}</p>
                 </div>
               </div>
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm font-medium text-gray-700">Role</p>
-                  <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Role</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-200 pt-6">
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-6">
             {message && (
               <div className={`mb-4 p-3 rounded-lg text-sm ${
                 message.includes('success') 
@@ -229,7 +229,7 @@ export default function ProfilePage() {
             <button
               onClick={handleSaveChanges}
               disabled={saving}
-              className="px-6 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 bg-gray-900 dark:bg-gray-800 text-white rounded-xl hover:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 border border-gray-800 dark:border-gray-700 font-semibold disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>
@@ -239,3 +239,4 @@ export default function ProfilePage() {
     </div>
   );
 }
+

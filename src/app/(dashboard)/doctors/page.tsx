@@ -26,30 +26,30 @@ export default function DoctorsPage() {
     fetchDoctors();
   }, []);
 
-  if (loading) return <div className="p-8">Loading...</div>;
+  if (loading) return <div className="p-8 text-gray-400 dark:text-gray-500">Loading...</div>;
 
   return (
     <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">Available Doctors</h1>
+      <h1 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">Available Doctors</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {doctors.map((doctor) => (
-          <Card key={doctor.id}>
+          <Card key={doctor.id} className="dark:bg-gray-900 dark:border-gray-800">
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="dark:text-gray-100">
                 Dr. {doctor.user.first_name} {doctor.user.last_name}
               </CardTitle>
-              <p className="text-sm text-gray-600">{doctor.specialization}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{doctor.specialization}</p>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <p className="text-sm"><strong>Qualification:</strong> {doctor.qualification}</p>
-                <p className="text-sm"><strong>Experience:</strong> {doctor.experience_years} years</p>
-                <p className="text-sm"><strong>Fee:</strong> ${doctor.consultation_fee}</p>
-                {doctor.bio && <p className="text-sm text-gray-600">{doctor.bio}</p>}
+                <p className="text-sm dark:text-gray-300"><strong className="dark:text-gray-200">Qualification:</strong> {doctor.qualification}</p>
+                <p className="text-sm dark:text-gray-300"><strong className="dark:text-gray-200">Experience:</strong> {doctor.experience_years} years</p>
+                <p className="text-sm dark:text-gray-300"><strong className="dark:text-gray-200">Fee:</strong> ${doctor.consultation_fee}</p>
+                {doctor.bio && <p className="text-sm text-gray-600 dark:text-gray-400">{doctor.bio}</p>}
                 
                 <Link href={`/appointments/book?doctor=${doctor.id}`}>
-                  <Button className="w-full mt-4">Book Appointment</Button>
+                  <Button className="w-full mt-4 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-100">Book Appointment</Button>
                 </Link>
               </div>
             </CardContent>

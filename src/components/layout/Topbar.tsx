@@ -19,7 +19,7 @@ export default function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuthStore();
-  const { toggleSidebar } = useUIStore();
+  const { toggleSidebar, isDarkMode, toggleDarkMode } = useUIStore();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -131,23 +131,25 @@ export default function Topbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 flex justify-between items-center h-16 px-4 md:px-8 bg-white border-b border-gray-200">
+    <header className="sticky top-0 z-40 flex justify-between items-center h-16 px-4 md:px-8 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
       <div className="flex items-center space-x-4">
-        {/* Hamburger Toggle Button */}
-        <button
-          onClick={toggleSidebar}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          aria-label="Toggle sidebar"
-        >
-          <span className="material-symbols-outlined text-gray-600 text-[24px]">menu</span>
-        </button>
-        
-        <div className="text-sm font-medium text-gray-900 capitalize">
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
           {pageName}
         </div>
       </div>
 
       <div className="flex items-center space-x-3 relative">
+        {/* Dark Mode Toggle */}
+        <button
+          onClick={() => toggleDarkMode()}
+          className="hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 transition-colors"
+          aria-label="Toggle dark mode"
+        >
+          <span className="material-symbols-outlined text-gray-600 dark:text-gray-300 text-[20px]">
+            {isDarkMode ? 'light_mode' : 'dark_mode'}
+          </span>
+        </button>
+
         {/* Notifications */}
         <div className="relative">
           <button 

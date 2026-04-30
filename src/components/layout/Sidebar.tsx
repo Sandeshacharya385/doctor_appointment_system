@@ -74,33 +74,46 @@ export default function Sidebar({ onLogout }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 flex flex-col z-50 transition-all duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-full bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 flex flex-col z-50 transition-all duration-300 ease-in-out ${
           isSidebarOpen ? 'w-64' : 'w-20'
         } ${isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'}`}
       >
         {/* Logo */}
-        <div className="flex items-center px-6 py-5 border-b border-gray-200 min-h-[73px]">
-          <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center text-white flex-shrink-0">
-            <span className="material-symbols-outlined text-[18px]">medical_services</span>
-          </div>
-          {isSidebarOpen && (
-            <div className="ml-3 overflow-hidden">
-              <h1 className="text-base font-semibold text-gray-900 whitespace-nowrap">MediBook</h1>
-              <p className="text-[10px] text-gray-500 whitespace-nowrap">Healthcare System</p>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-gray-800 min-h-[73px]">
+          <div className="flex items-center">
+            <div className="w-8 h-8 rounded-lg bg-gray-900 dark:bg-gray-800 flex items-center justify-center text-white flex-shrink-0">
+              <span className="material-symbols-outlined text-[18px]">medical_services</span>
             </div>
-          )}
+            {isSidebarOpen && (
+              <div className="ml-3 overflow-hidden">
+                <h1 className="text-base font-semibold text-gray-900 dark:text-gray-100 whitespace-nowrap">MediBook</h1>
+                <p className="text-[10px] text-gray-500 dark:text-gray-400 whitespace-nowrap">Healthcare System</p>
+              </div>
+            )}
+          </div>
+          {/* Slide to Hide Button */}
+          <button
+            onClick={() => setSidebarOpen(!isSidebarOpen)}
+            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200 group"
+            aria-label="Toggle sidebar"
+            title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <span className="material-symbols-outlined text-gray-600 dark:text-gray-400 text-[20px] transition-transform duration-200 group-hover:scale-110">
+              {isSidebarOpen ? 'chevron_left' : 'chevron_right'}
+            </span>
+          </button>
         </div>
 
         {/* User info */}
-        <div className={`px-6 py-4 border-b border-gray-200 ${!isSidebarOpen && 'px-3'}`}>
+        <div className={`px-6 py-4 border-b border-gray-200 dark:border-gray-800 ${!isSidebarOpen && 'px-3'}`}>
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-semibold text-gray-700 text-sm flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-semibold text-gray-700 dark:text-gray-300 text-sm flex-shrink-0">
               {fullName[0]?.toUpperCase() || 'U'}
             </div>
             {isSidebarOpen && (
               <div className="min-w-0 flex-1 overflow-hidden">
-                <p className="font-medium text-sm text-gray-900 truncate">{fullName}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                <p className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">{fullName}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{user?.role}</p>
               </div>
             )}
           </div>
@@ -119,7 +132,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
                 className={`flex items-center ${
                   isSidebarOpen ? 'space-x-3 px-3' : 'justify-center px-2'
                 } py-2.5 rounded-lg transition-all duration-200 text-sm font-medium group relative ${
-                  isActive ? 'bg-gray-900 text-white' : 'text-gray-700 hover:bg-gray-100'
+                  isActive ? 'bg-gray-900 text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-800'
                 }`}
                 title={!isSidebarOpen ? item.label : ''}
               >
@@ -143,7 +156,7 @@ export default function Sidebar({ onLogout }: SidebarProps) {
             onClick={onLogout}
             className={`flex items-center ${
               isSidebarOpen ? 'space-x-3 px-3' : 'justify-center px-2'
-            } py-2.5 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-colors text-sm font-medium rounded-lg w-full group relative`}
+            } py-2.5 text-gray-700 dark:text-gray-300 hover:bg-red-50 hover:text-red-600 transition-colors text-sm font-medium rounded-lg w-full group relative`}
             title={!isSidebarOpen ? 'Logout' : ''}
           >
             <span className="material-symbols-outlined text-[20px] flex-shrink-0">logout</span>
@@ -161,3 +174,4 @@ export default function Sidebar({ onLogout }: SidebarProps) {
     </>
   );
 }
+
