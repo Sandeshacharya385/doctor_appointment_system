@@ -4,6 +4,16 @@ import { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { useUIStore } from '@/store/useUIStore';
+import { api } from '@/lib/api';
+import { formatDistanceToNow } from 'date-fns';
+
+interface Notification {
+  id: number;
+  title: string;
+  message: string;
+  is_read: boolean;
+  created_at: string;
+}
 
 export default function Topbar() {
   const pathname = usePathname();
@@ -12,6 +22,8 @@ export default function Topbar() {
   const { toggleSidebar } = useUIStore();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
   
   // Get profile picture URL
   const getProfilePictureUrl = () => {
@@ -28,32 +40,28 @@ export default function Topbar() {
   };
   
   const profilePictureUrl = getProfilePictureUrl();
-  
-  // Role-based notifications
-  const getNotifications = () => {
-    if (user?.role === 'doctor') {
-      return [
-        { id: 1, title: 'New appointment request', message: 'A patient has requested an appointment', time: '5 min ago', unread: true, link: '/doctor' },
-        { id: 2, title: 'Appointment confirmed', message: 'Patient confirmed their appointment', time: '1 hour ago', unread: true, link: '/doctor' },
-        { id: 3, title: 'Appointment completed', message: 'Appointment marked as completed', time: '2 hours ago', unread: false, link: '/doctor' },
-      ];
-    }
-    // Patient notifications
-    return [
-      { id: 1, title: 'New appointment booked', message: 'You have a new appointment scheduled', time: '5 min ago', unread: true, link: '/appointments' },
-      { id: 2, title: 'Prescription updated', message: 'Your prescription has been updated', time: '1 hour ago', unread: true, link: '/prescriptions' },
-      { id: 3, title: 'Payment received', message: 'Payment of $150 received', time: '2 hours ago', unread: false, link: '/payments' },
-    ];
-  };
-  
-  const [notifications, setNotifications] = useState(getNotifications());
 
-  // Update notifications when user role changes
+  // Fetch notifications from API
   useEffect(() => {
     if (user) {
-      setNotifications(getNotifications());
+      fetchNotifications();
     }
-  }, [user?.role]);
+  }, [user]);
+
+  const fetchNotifications = async () => {
+    setLoadingNotifications(true);
+    try {
+      const response = await api.get('/notifications/');
+      // Ensure we always set an array
+      const data = Array.isArray(response.data) ? response.data : [];
+      setNotifications(data);
+    } catch (error) {
+      console.error('Failed to fetch notifications:', error);
+      setNotifications([]); // Set empty array on error
+    } finally {
+      setLoadingNotifications(false);
+    }
+  };
 
   const fullName = user?.first_name
     ? `${user.first_name} ${user.last_name || ''}`.trim()
@@ -61,33 +69,60 @@ export default function Topbar() {
 
   const pageName = pathname.split('/')[1] || 'Dashboard';
 
-  const hasUnreadNotifications = notifications.some(n => n.unread);
+  const hasUnreadNotifications = Array.isArray(notifications) && notifications.some(n => !n.is_read);
 
-  const markAsRead = (notificationId: number) => {
-    setNotifications(prev =>
-      prev.map(notif =>
-        notif.id === notificationId ? { ...notif, unread: false } : notif
-      )
-    );
+  const markAsRead = async (notificationId: number) => {
+    try {
+      await api.post(`/notifications/${notificationId}/mark-read/`);
+      setNotifications(prev =>
+        Array.isArray(prev) ? prev.map(notif =>
+          notif.id === notificationId ? { ...notif, is_read: true } : notif
+        ) : []
+      );
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
   };
 
-  const handleNotificationClick = (notification: typeof notifications[0]) => {
+  const handleNotificationClick = (notification: Notification) => {
     // Mark as read
     markAsRead(notification.id);
     
     // Close dropdown
     setShowNotifications(false);
     
-    // Navigate to the link
-    if (notification.link) {
-      router.push(notification.link);
+    // Determine navigation based on notification title/message
+    // You can customize this logic based on your notification types
+    if (notification.title.toLowerCase().includes('appointment')) {
+      if (user?.role === 'doctor') {
+        router.push('/doctor');
+      } else {
+        router.push('/appointments');
+      }
+    } else if (notification.title.toLowerCase().includes('prescription')) {
+      router.push('/prescriptions');
+    } else if (notification.title.toLowerCase().includes('payment')) {
+      router.push('/payments');
     }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notif => ({ ...notif, unread: false }))
-    );
+  const markAllAsRead = async () => {
+    try {
+      await api.post('/notifications/mark-all-read/');
+      setNotifications(prev =>
+        Array.isArray(prev) ? prev.map(notif => ({ ...notif, is_read: true })) : []
+      );
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
+  };
+
+  const getTimeAgo = (dateString: string) => {
+    try {
+      return formatDistanceToNow(new Date(dateString), { addSuffix: true });
+    } catch {
+      return 'Recently';
+    }
   };
 
   const handleLogout = () => {
@@ -150,7 +185,11 @@ export default function Topbar() {
                   )}
                 </div>
                 <div className="max-h-96 overflow-y-auto">
-                  {notifications.length === 0 ? (
+                  {loadingNotifications ? (
+                    <div className="p-8 text-center text-gray-500 text-sm">
+                      Loading notifications...
+                    </div>
+                  ) : notifications.length === 0 ? (
                     <div className="p-8 text-center text-gray-500 text-sm">
                       No notifications
                     </div>
@@ -160,16 +199,16 @@ export default function Topbar() {
                         key={notif.id}
                         onClick={() => handleNotificationClick(notif)}
                         className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                          notif.unread ? 'bg-gray-50' : ''
+                          !notif.is_read ? 'bg-gray-50' : ''
                         }`}
                       >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <p className="text-sm font-medium text-gray-900">{notif.title}</p>
                             <p className="text-xs text-gray-600 mt-1">{notif.message}</p>
-                            <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
+                            <p className="text-xs text-gray-400 mt-1">{getTimeAgo(notif.created_at)}</p>
                           </div>
-                          {notif.unread && (
+                          {!notif.is_read && (
                             <span className="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0 mt-1"></span>
                           )}
                         </div>
@@ -178,7 +217,13 @@ export default function Topbar() {
                   )}
                 </div>
                 <div className="p-3 border-t border-gray-200 text-center">
-                  <button className="text-sm text-gray-600 hover:text-gray-900 font-medium">
+                  <button 
+                    onClick={() => {
+                      setShowNotifications(false);
+                      // You can create a notifications page later
+                    }}
+                    className="text-sm text-gray-600 hover:text-gray-900 font-medium"
+                  >
                     View all notifications
                   </button>
                 </div>
