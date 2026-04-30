@@ -31,21 +31,36 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
+      const refreshToken = localStorage.getItem('refresh_token');
+      
+      // If no refresh token, redirect to login immediately
+      if (!refreshToken) {
+        console.error('No refresh token available');
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+      
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
         const response = await axios.post(`${API_URL}/auth/token/refresh/`, {
           refresh: refreshToken,
         });
         
-        localStorage.setItem('access_token', response.data.access);
-        api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+        const newAccessToken = response.data.access;
+        localStorage.setItem('access_token', newAccessToken);
         
+        // Update the authorization header for the original request
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        
+        // Retry the original request with the new token
         return api(originalRequest);
       } catch (err) {
         console.error('Token refresh failed:', err);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         window.location.href = '/login';
+        return Promise.reject(err);
       }
     }
     

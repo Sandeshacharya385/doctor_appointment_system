@@ -39,9 +39,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       api
         .get('/auth/profile/')
         .then((r) => setUser(r.data))
-        .catch(() => {
-          logout();
-          router.push('/login');
+        .catch((err) => {
+          console.error('Failed to load user profile:', err);
+          // Only logout if it's an authentication error
+          if (err.response?.status === 401) {
+            logout();
+            router.push('/login');
+          }
         });
     }
   }, [user, setUser, router, logout]);
