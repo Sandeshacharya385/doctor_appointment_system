@@ -12,7 +12,22 @@ export default function ProfilePage() {
     email: user?.email || '',
     phone: user?.phone || '',
   });
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  
+  // Get existing profile picture URL
+  const getExistingProfilePicture = () => {
+    if (!user?.profile_picture) return null;
+    
+    // If it's already a full URL, return as is
+    if (user.profile_picture.startsWith('http')) {
+      return user.profile_picture;
+    }
+    
+    // Otherwise, prepend the backend URL
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+    return `${backendUrl}${user.profile_picture}`;
+  };
+  
+  const [profileImage, setProfileImage] = useState<string | null>(getExistingProfilePicture());
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');

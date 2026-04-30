@@ -13,6 +13,22 @@ export default function Topbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   
+  // Get profile picture URL
+  const getProfilePictureUrl = () => {
+    if (!user?.profile_picture) return null;
+    
+    // If it's already a full URL, return as is
+    if (user.profile_picture.startsWith('http')) {
+      return user.profile_picture;
+    }
+    
+    // Otherwise, prepend the backend URL
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:8000';
+    return `${backendUrl}${user.profile_picture}`;
+  };
+  
+  const profilePictureUrl = getProfilePictureUrl();
+  
   // Role-based notifications
   const getNotifications = () => {
     if (user?.role === 'doctor') {
@@ -178,9 +194,17 @@ export default function Topbar() {
               setShowProfileMenu(!showProfileMenu);
               setShowNotifications(false);
             }}
-            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-sm hover:bg-gray-200 transition-colors"
+            className="w-8 h-8 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-gray-700 font-semibold text-sm hover:bg-gray-200 transition-colors border border-gray-200"
           >
-            {fullName[0]?.toUpperCase() || 'U'}
+            {profilePictureUrl ? (
+              <img 
+                src={profilePictureUrl} 
+                alt={fullName}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>{fullName[0]?.toUpperCase() || 'U'}</span>
+            )}
           </button>
 
           {/* Profile Dropdown */}
@@ -192,9 +216,24 @@ export default function Topbar() {
               />
               <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                 <div className="p-4 border-b border-gray-200">
-                  <p className="font-semibold text-gray-900">{fullName}</p>
-                  <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
-                  <p className="text-xs text-gray-500 mt-1">{user?.email}</p>
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center text-gray-700 font-semibold border border-gray-200">
+                      {profilePictureUrl ? (
+                        <img 
+                          src={profilePictureUrl} 
+                          alt={fullName}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-lg">{fullName[0]?.toUpperCase() || 'U'}</span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-gray-900">{fullName}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
                 <div className="py-2">
                   <button
