@@ -50,7 +50,7 @@ export default function LoginPage() {
       
       // Redirect based on role
       if (userResponse.data.role === 'doctor') {
-        router.push('/doctor');
+        router.push('/dashboard');  // Redirect to dashboard for doctors
       } else {
         router.push('/dashboard');
       }
