@@ -38,7 +38,12 @@ api.interceptors.response.use(
         console.error('No refresh token available');
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
+        
+        // Show user-friendly message
+        if (typeof window !== 'undefined') {
+          alert('Your session has expired. Please log in again.');
+          window.location.href = '/login';
+        }
         return Promise.reject(error);
       }
       
@@ -59,7 +64,12 @@ api.interceptors.response.use(
         console.error('Token refresh failed:', err);
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
-        window.location.href = '/login';
+        
+        // Show user-friendly message
+        if (typeof window !== 'undefined') {
+          alert('Your session has expired. Please log in again.');
+          window.location.href = '/login';
+        }
         return Promise.reject(err);
       }
     }
