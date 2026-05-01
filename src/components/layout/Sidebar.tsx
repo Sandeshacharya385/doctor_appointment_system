@@ -91,17 +91,19 @@ export default function Sidebar({ onLogout }: SidebarProps) {
               </div>
             )}
           </div>
-          {/* Slide to Hide Button */}
-          <button
-            onClick={() => setSidebarOpen(!isSidebarOpen)}
-            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200 group"
-            aria-label="Toggle sidebar"
-            title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            <span className="material-symbols-outlined text-gray-600 dark:text-gray-400 text-[20px] transition-transform duration-200 group-hover:scale-110">
-              {isSidebarOpen ? 'chevron_left' : 'chevron_right'}
-            </span>
-          </button>
+          {/* Slide to Hide Button - Always visible on desktop, hidden on mobile when sidebar is closed */}
+          {(isSidebarOpen || !isMobile) && (
+            <button
+              onClick={() => setSidebarOpen(!isSidebarOpen)}
+              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200 group flex-shrink-0"
+              aria-label="Toggle sidebar"
+              title={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+            >
+              <span className="material-symbols-outlined text-gray-600 dark:text-gray-400 text-[20px] transition-transform duration-200 group-hover:scale-110">
+                {isSidebarOpen ? 'chevron_left' : 'chevron_right'}
+              </span>
+            </button>
+          )}
         </div>
 
         {/* User info */}

@@ -133,6 +133,17 @@ export default function Topbar() {
   return (
     <header className="sticky top-0 z-40 flex justify-between items-center h-16 px-4 md:px-8 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
       <div className="flex items-center space-x-4">
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => toggleSidebar()}
+          className="md:hidden hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg p-2 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <span className="material-symbols-outlined text-gray-600 dark:text-gray-300 text-[24px]">
+            menu
+          </span>
+        </button>
+        
         <div className="text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
           {pageName}
         </div>
