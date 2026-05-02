@@ -10,6 +10,7 @@ import { api } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import Image from 'next/image';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -32,17 +33,71 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState<UserType>('patient');
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
   });
+
+  const handleProfilePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Profile picture must be less than 5MB');
+        return;
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        setError('Please select a valid image file');
+        return;
+      }
+      
+      setProfilePicture(file);
+      setError('');
+      
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeProfilePicture = () => {
+    setProfilePicture(null);
+    setPreviewUrl(null);
+  };
 
   const onSubmit = async (data: RegisterForm) => {
     setLoading(true);
     setError('');
     
     try {
-      await api.post('/auth/register/', { ...data, role: userType });
+      // Create FormData to handle file upload
+      const formData = new FormData();
+      formData.append('username', data.username);
+      formData.append('email', data.email);
+      formData.append('password', data.password);
+      formData.append('password2', data.password2);
+      formData.append('first_name', data.first_name);
+      formData.append('last_name', data.last_name);
+      formData.append('role', userType);
+      if (data.phone) {
+        formData.append('phone', data.phone);
+      }
+      if (profilePicture) {
+        formData.append('profile_picture', profilePicture);
+      }
+
+      await api.post('/auth/register/', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       router.push('/login');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed');
@@ -99,6 +154,59 @@ export default function RegisterPage() {
                 {error}
               </div>
             )}
+            
+            {/* Profile Picture Upload */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Profile Picture <span className="text-gray-400">(optional)</span>
+              </label>
+              <div className="flex items-center gap-4">
+                {/* Preview */}
+                <div className="relative w-24 h-24 rounded-full overflow-hidden bg-gray-100 border-2 border-gray-200 flex items-center justify-center">
+                  {previewUrl ? (
+                    <Image
+                      src={previewUrl}
+                      alt="Profile preview"
+                      fill
+                      className="object-cover"
+                    />
+                  ) : (
+                    <span className="material-symbols-outlined text-gray-400 text-[48px]">
+                      account_circle
+                    </span>
+                  )}
+                </div>
+                
+                {/* Upload/Remove Buttons */}
+                <div className="flex-1">
+                  {!profilePicture ? (
+                    <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-all">
+                      <span className="material-symbols-outlined text-[20px]">upload</span>
+                      <span className="text-sm font-medium">Upload Photo</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProfilePictureChange}
+                        className="hidden"
+                      />
+                    </label>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-600 truncate">{profilePicture.name}</p>
+                      <button
+                        type="button"
+                        onClick={removeProfilePicture}
+                        className="inline-flex items-center gap-1 text-sm text-red-600 hover:text-red-700"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 mt-2">Max 5MB • JPG, PNG, GIF</p>
+                </div>
+              </div>
+            </div>
             
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
