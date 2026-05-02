@@ -18,7 +18,7 @@ const registerSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   password2: z.string(),
   first_name: z.string().min(1, 'First name is required'),
-  last_name: z.string().min(1, 'Last name is required'),
+  last_name: z.string().optional(),
   phone: z.string().optional(),
 }).refine((data) => data.password === data.password2, {
   message: "Passwords don't match",
@@ -84,7 +84,9 @@ export default function RegisterPage() {
       formData.append('password', data.password);
       formData.append('password2', data.password2);
       formData.append('first_name', data.first_name);
-      formData.append('last_name', data.last_name);
+      if (data.last_name) {
+        formData.append('last_name', data.last_name);
+      }
       formData.append('role', userType);
       if (data.phone) {
         formData.append('phone', data.phone);
@@ -100,7 +102,25 @@ export default function RegisterPage() {
       });
       router.push('/login');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Registration failed');
+      // Handle different error formats
+      const errorData = err.response?.data;
+      
+      if (errorData?.detail) {
+        // General error message
+        setError(errorData.detail);
+      } else if (errorData?.username) {
+        // Username specific error
+        setError(Array.isArray(errorData.username) ? errorData.username[0] : errorData.username);
+      } else if (errorData?.email) {
+        // Email specific error
+        setError(Array.isArray(errorData.email) ? errorData.email[0] : errorData.email);
+      } else if (errorData?.password) {
+        // Password specific error
+        setError(Array.isArray(errorData.password) ? errorData.password[0] : errorData.password);
+      } else {
+        // Fallback error message
+        setError('Registration failed. Please check your information and try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -217,18 +237,18 @@ export default function RegisterPage() {
                 <input
                   {...register('first_name')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
-                  placeholder="John"
+                  placeholder=""
                 />
                 {errors.first_name && <p className="text-red-500 text-sm mt-1">{errors.first_name.message}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Last Name
+                  Last Name <span className="text-gray-400">(optional)</span>
                 </label>
                 <input
                   {...register('last_name')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
-                  placeholder="Doe"
+                  placeholder=""
                 />
                 {errors.last_name && <p className="text-red-500 text-sm mt-1">{errors.last_name.message}</p>}
               </div>
@@ -246,7 +266,7 @@ export default function RegisterPage() {
                 <input
                   {...register('username')}
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
-                  placeholder="johndoe"
+                  placeholder=""
                 />
               </div>
               {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>}
@@ -265,7 +285,7 @@ export default function RegisterPage() {
                   {...register('email')}
                   type="email"
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
-                  placeholder="john@example.com"
+                  placeholder=""
                 />
               </div>
               {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
@@ -283,7 +303,7 @@ export default function RegisterPage() {
                 <input
                   {...register('phone')}
                   className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all"
-                  placeholder="+1 234 567 8900"
+                  placeholder=""
                 />
               </div>
             </div>
