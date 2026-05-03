@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #000;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #333;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login Test Page</h1>
+    <p>This page tests the login functionality directly</p>
+
+    <div class="test-section">
+        <h2>Test 1: Login API</h2>
+        <button onclick="testLogin()">Test Login (drsmith / doctor123)</button>
+        <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Profile API (after login)</h2>
+        <button onclick="testProfile()">Test Profile</button>
+        <div id="profile-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Full Login Flow</h2>
+        <button onclick="testFullFlow()">Test Complete Flow</button>
+        <div id="flow-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Logs</h2>
+        <div id="console-logs" style="max-height: 300px; overflow-y: auto;"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://127.0.0.1:8000/api';
+        let accessToken = null;
+
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('console-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            logsDiv.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+            console.log(message);
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            log('Starting login test...');
+
+            try {
+                log(`POST ${API_URL}/auth/login/`);
+                log('Body: {"username": "drsmith", "password": "doctor123"}');
+
+                const response = await fetch(`${API_URL}/auth/login/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        username: 'drsmith',
+                        password: 'doctor123'
+                    })
+                });
+
+                log(`Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    accessToken = data.access;
+                    localStorage.setItem('access_token', data.access);
+                    localStorage.setItem('refresh_token', data.refresh);
+                    
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Login Successful!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    log('Login successful!', 'success');
+                    log(`Access token: ${data.access.substring(0, 50)}...`);
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Login Failed!</p>
+                        <p>Status: ${response.status}</p>
+                        <pre>${error}</pre>
+                    `;
+                    log(`Login failed: ${response.status}`, 'error');
+                    log(`Error: ${error}`, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Network Error!</p>
+                    <pre>${error.message}</pre>
+                `;
+                log(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testProfile() {
+            const resultDiv = document.getElementById('profile-result');
+            
+            if (!accessToken) {
+                accessToken = localStorage.getItem('access_token');
+            }
+
+            if (!accessToken) {
+                resultDiv.innerHTML = '<p class="error">❌ No access token! Please login first.</p>';
+                log('No access token found', 'error');
+                return;
+            }
+
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            log('Starting profile test...');
+
+            try {
+                log(`GET ${API_URL}/auth/profile/`);
+                log(`Authorization: Bearer ${accessToken.substring(0, 30)}...`);
+
+                const response = await fetch(`${API_URL}/auth/profile/`, {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    }
+                });
+
+                log(`Response status: ${response.status}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    resultDiv.innerHTML = `
+                        <p class="success">✅ Profile Fetched!</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                    log('Profile fetched successfully!', 'success');
+                    log(`User: ${data.username} (${data.role})`);
+                } else {
+                    const error = await response.text();
+                    resultDiv.innerHTML = `
+                        <p class="error">❌ Profile Fetch Failed!</p>
+                        <p>Status: ${response.status}</p>
+                        <pre>${error}</pre>
+                    `;
+                    log(`Profile fetch failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <p class="error">❌ Network Error!</p>
+                    <pre>${error.message}</pre>
+                `;
+                log(`Network error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFullFlow() {
+            const resultDiv = document.getElementById('flow-result');
+            resultDiv.innerHTML = '<p>Testing complete flow...</p>';
+            log('='.repeat(50));
+            log('Starting complete login flow test...');
+
+            // Step 1: Login
+            await testLogin();
+            
+            // Wait a bit
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Step 2: Get Profile
+            await testProfile();
+            
+            log('Complete flow test finished!');
+            log('='.repeat(50));
+            
+            resultDiv.innerHTML = '<p class="success">✅ Check results above</p>';
+        }
+
+        // Log initial state
+        log('Test page loaded');
+        log(`API URL: ${API_URL}`);
+        log(`Current page: ${window.location.href}`);
+    </script>
+</body>
+</html>

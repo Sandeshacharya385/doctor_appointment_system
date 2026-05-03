@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
+import { toast } from 'sonner';
 
 type UserType = 'patient' | 'doctor';
 
@@ -26,36 +27,73 @@ export default function LoginPage() {
     setError('');
     
     try {
+      // Step 1: Login and get tokens
+      console.log('Attempting login for:', formData.username);
       const response = await api.post('/auth/login/', formData);
+      
+      if (!response.data.access || !response.data.refresh) {
+        throw new Error('Invalid response from server');
+      }
+      
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
+      console.log('Tokens stored successfully');
       
+      // Step 2: Fetch user profile
       const userResponse = await api.get('/auth/profile/');
+      console.log('User profile fetched:', userResponse.data);
       setUser(userResponse.data);
       
-      // Verify user role matches selected type
+      // Step 3: Verify user role matches selected type
       if (userType === 'doctor' && userResponse.data.role !== 'doctor') {
-        setError('Please use the Patient/User login for your account');
+        const errorMsg = 'Please use the Patient/User login for your account';
+        setError(errorMsg);
+        toast.error('Wrong Login Type', {
+          description: errorMsg,
+        });
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        setLoading(false);
         return;
       }
       
       if (userType === 'patient' && userResponse.data.role === 'doctor') {
-        setError('Please use the Doctor login for your account');
+        const errorMsg = 'Please use the Doctor login for your account';
+        setError(errorMsg);
+        toast.error('Wrong Login Type', {
+          description: errorMsg,
+        });
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        setLoading(false);
         return;
       }
       
-      // Redirect based on role
-      if (userResponse.data.role === 'doctor') {
-        router.push('/dashboard');  // Redirect to dashboard for doctors
-      } else {
-        router.push('/dashboard');
-      }
+      // Step 4: Show success toast
+      const userName = userResponse.data.first_name || userResponse.data.username;
+      toast.success(`Welcome back, ${userName}!`, {
+        description: 'You have successfully logged in.',
+      });
+      
+      // Step 5: Redirect to dashboard
+      console.log('Redirecting to dashboard...');
+      router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
+      console.error('Login error:', err);
+      let errorMsg = 'Login failed. Please check your credentials.';
+      
+      if (err.response?.status === 401) {
+        errorMsg = 'Invalid username or password. Please try again.';
+      } else if (err.response?.data?.detail) {
+        errorMsg = err.response.data.detail;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
+      setError(errorMsg);
+      toast.error('Login Failed', {
+        description: errorMsg,
+      });
     } finally {
       setLoading(false);
     }

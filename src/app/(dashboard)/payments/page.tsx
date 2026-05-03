@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Appointment } from '@/types';
+import { toast } from 'sonner';
 
 // ── Change this to your WhatsApp number (with country code, no + or spaces) ──
 const WHATSAPP_NUMBER = '9779800000000';
@@ -33,7 +34,10 @@ export default function PaymentsPage() {
   useEffect(() => {
     api.get('/appointments/')
       .then(r => setAppointments(r.data.results || r.data))
-      .catch(console.error)
+      .catch((err) => {
+        console.error(err);
+        toast.error('Failed to load appointments');
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -41,6 +45,11 @@ export default function PaymentsPage() {
     setPaying(appt.id);
     const url = buildWhatsAppURL(appt);
     window.open(url, '_blank');
+    
+    toast.success('Payment Request Sent', {
+      description: 'WhatsApp opened. Please complete your payment confirmation.',
+    });
+    
     setTimeout(() => setPaying(null), 2000);
   };
 

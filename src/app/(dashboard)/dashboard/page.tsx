@@ -6,6 +6,7 @@ import { api } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { Appointment, Doctor } from '@/types';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
@@ -15,6 +16,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Wait for user to be loaded by the layout
+      if (!user) {
+        return;
+      }
+      
+      setLoading(true);
       try {
         const [apptRes, docRes] = await Promise.all([
           api.get('/appointments/'),
@@ -26,13 +33,25 @@ export default function DashboardPage() {
         console.error('Dashboard fetch error:', e);
         if (e.response?.status === 403) {
           console.error('403 Forbidden - Check user permissions and authentication token');
+          toast.error('Access Denied', {
+            description: 'You do not have permission to view this data.',
+          });
+        } else if (e.response?.status === 401) {
+          toast.error('Session Expired', {
+            description: 'Please log in again.',
+          });
+        } else {
+          toast.error('Failed to Load Dashboard', {
+            description: 'Could not fetch dashboard data. Please try again.',
+          });
         }
       } finally {
         setLoading(false);
       }
     };
+    
     fetchData();
-  }, []);
+  }, [user]);
 
   const todayStr = new Date().toISOString().split('T')[0];
   const todayAppts = appointments.filter(a => a.appointment_date === todayStr);
@@ -51,10 +70,14 @@ export default function DashboardPage() {
     ? `${user.first_name} ${user.last_name || ''}`.trim()
     : user?.username || 'User';
 
-  if (loading) {
+  // Show loading state while user is being loaded or data is being fetched
+  if (!user || loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-400 dark:text-gray-500 text-sm">Loading dashboard...</div>
+        <div className="flex flex-col items-center space-y-3">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 dark:border-gray-100"></div>
+          <div className="text-gray-600 dark:text-gray-400 text-sm">Loading dashboard...</div>
+        </div>
       </div>
     );
   }

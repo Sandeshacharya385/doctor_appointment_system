@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
+import { toast } from 'sonner';
 
 const registerSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -45,18 +46,23 @@ export default function RegisterPage() {
     if (file) {
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError('Profile picture must be less than 5MB');
+        const errorMsg = 'Profile picture must be less than 5MB';
+        setError(errorMsg);
+        toast.error(errorMsg);
         return;
       }
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        setError('Please select a valid image file');
+        const errorMsg = 'Please select a valid image file';
+        setError(errorMsg);
+        toast.error(errorMsg);
         return;
       }
       
       setProfilePicture(file);
       setError('');
+      toast.success('Profile picture selected');
       
       // Create preview URL
       const reader = new FileReader();
@@ -70,6 +76,7 @@ export default function RegisterPage() {
   const removeProfilePicture = () => {
     setProfilePicture(null);
     setPreviewUrl(null);
+    toast.info('Profile picture removed');
   };
 
   const onSubmit = async (data: RegisterForm) => {
@@ -100,27 +107,37 @@ export default function RegisterPage() {
           'Content-Type': 'multipart/form-data',
         },
       });
+      
+      toast.success('Registration Successful!', {
+        description: 'Your account has been created. Please log in to continue.',
+      });
+      
       router.push('/login');
     } catch (err: any) {
       // Handle different error formats
       const errorData = err.response?.data;
+      let errorMsg = '';
       
       if (errorData?.detail) {
         // General error message
-        setError(errorData.detail);
+        errorMsg = errorData.detail;
       } else if (errorData?.username) {
         // Username specific error
-        setError(Array.isArray(errorData.username) ? errorData.username[0] : errorData.username);
+        errorMsg = Array.isArray(errorData.username) ? errorData.username[0] : errorData.username;
       } else if (errorData?.email) {
         // Email specific error
-        setError(Array.isArray(errorData.email) ? errorData.email[0] : errorData.email);
+        errorMsg = Array.isArray(errorData.email) ? errorData.email[0] : errorData.email;
       } else if (errorData?.password) {
         // Password specific error
-        setError(Array.isArray(errorData.password) ? errorData.password[0] : errorData.password);
+        errorMsg = Array.isArray(errorData.password) ? errorData.password[0] : errorData.password;
       } else {
-        // Fallback error message
-        setError('Registration failed. Please check your information and try again.');
+        errorMsg = 'Registration failed. Please check your information and try again.';
       }
+      
+      setError(errorMsg);
+      toast.error('Registration Failed', {
+        description: errorMsg,
+      });
     } finally {
       setLoading(false);
     }

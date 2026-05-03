@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { api } from '@/lib/api';
 import { Doctor, TimeSlot } from '@/types';
+import { toast } from 'sonner';
 
 const schema = z.object({
   appointment_date: z.string().min(1, 'Select a date'),
@@ -36,7 +37,9 @@ export default function BookAppointmentPage() {
   // Load doctor info
   useEffect(() => {
     if (doctorId) {
-      api.get(`/doctors/${doctorId}/`).then(r => setDoctor(r.data)).catch(() => {});
+      api.get(`/doctors/${doctorId}/`).then(r => setDoctor(r.data)).catch(() => {
+        toast.error('Failed to load doctor information');
+      });
     }
   }, [doctorId]);
 
@@ -49,14 +52,26 @@ export default function BookAppointmentPage() {
     api.get(`/doctors/${doctorId}/slots/?date=${selectedDate}`)
       .then(r => {
         setSlots(r.data.slots || []);
-        if (r.data.message) setSlotsMsg(r.data.message);
+        if (r.data.message) {
+          setSlotsMsg(r.data.message);
+          toast.info(r.data.message);
+        }
       })
-      .catch(() => setSlotsMsg('Could not load slots.'))
+      .catch(() => {
+        const msg = 'Could not load slots.';
+        setSlotsMsg(msg);
+        toast.error(msg);
+      })
       .finally(() => setSlotsLoading(false));
   }, [doctorId, selectedDate]);
 
   const onSubmit = async (data: FormData) => {
-    if (!selectedTime) { setError('Please select a time slot.'); return; }
+    if (!selectedTime) { 
+      const errorMsg = 'Please select a time slot.';
+      setError(errorMsg); 
+      toast.error(errorMsg);
+      return; 
+    }
     setLoading(true);
     setError('');
     try {
@@ -66,14 +81,24 @@ export default function BookAppointmentPage() {
         appointment_time: selectedTime,
         reason: data.reason,
       });
+      
+      toast.success('Appointment Booked Successfully!', {
+        description: `Your appointment is scheduled for ${data.appointment_date} at ${selectedTime}`,
+      });
+      
       router.push('/appointments');
     } catch (e: any) {
       const msg = e.response?.data;
+      let errorMsg = '';
       if (typeof msg === 'object') {
-        setError(Object.values(msg).flat().join(' '));
+        errorMsg = Object.values(msg).flat().join(' ');
       } else {
-        setError('Booking failed. Please try again.');
+        errorMsg = 'Booking failed. Please try again.';
       }
+      setError(errorMsg);
+      toast.error('Booking Failed', {
+        description: errorMsg,
+      });
     } finally {
       setLoading(false);
     }

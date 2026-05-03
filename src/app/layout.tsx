@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const manrope = Manrope({ subsets: ["latin"], variable: '--font-manrope' });
@@ -35,7 +36,15 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.variable} ${manrope.variable} font-sans`} suppressHydrationWarning>{children}</body>
+      <body className={`${inter.variable} ${manrope.variable} font-sans`} suppressHydrationWarning>
+        {children}
+        <Toaster 
+          position="top-right" 
+          richColors 
+          closeButton
+          duration={4000}
+        />
+      </body>
     </html>
   );
 }
