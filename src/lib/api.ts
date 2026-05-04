@@ -26,7 +26,10 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
     
-    console.error('API Error:', error.response?.status, error.config?.url, error.response?.data);
+    // Don't log 401 errors during token refresh attempts
+    if (error.response?.status !== 401 || originalRequest._retry) {
+      console.error('API Error:', error.response?.status, error.config?.url, error.response?.data);
+    }
     
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;

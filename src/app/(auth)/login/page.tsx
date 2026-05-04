@@ -35,16 +35,19 @@ export default function LoginPage() {
         throw new Error('Invalid response from server');
       }
       
+      // Step 2: Store tokens FIRST
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
       console.log('Tokens stored successfully');
       
-      // Step 2: Fetch user profile
+      // Step 3: Wait a moment for tokens to be stored
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Step 4: Fetch user profile with the new token
       const userResponse = await api.get('/auth/profile/');
       console.log('User profile fetched:', userResponse.data);
-      setUser(userResponse.data);
       
-      // Step 3: Verify user role matches selected type
+      // Step 5: Verify user role matches selected type
       if (userType === 'doctor' && userResponse.data.role !== 'doctor') {
         const errorMsg = 'Please use the Patient/User login for your account';
         setError(errorMsg);
@@ -69,13 +72,16 @@ export default function LoginPage() {
         return;
       }
       
-      // Step 4: Show success toast
+      // Step 6: Set user in store
+      setUser(userResponse.data);
+      
+      // Step 7: Show success toast
       const userName = userResponse.data.first_name || userResponse.data.username;
       toast.success(`Welcome back, ${userName}!`, {
         description: 'You have successfully logged in.',
       });
       
-      // Step 5: Redirect to dashboard
+      // Step 8: Redirect to dashboard
       console.log('Redirecting to dashboard...');
       router.push('/dashboard');
     } catch (err: any) {
@@ -89,6 +95,10 @@ export default function LoginPage() {
       } else if (err.message) {
         errorMsg = err.message;
       }
+      
+      // Clear tokens on error
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       
       setError(errorMsg);
       toast.error('Login Failed', {

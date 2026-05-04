@@ -7,13 +7,15 @@ import { useAuthStore } from '@/store/authStore';
 
 export default function Home() {
   const router = useRouter();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { user, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
-    if (isAuthenticated || localStorage.getItem('access_token')) {
+    // Only redirect if user is actually authenticated with a valid token
+    const token = localStorage.getItem('access_token');
+    if (token && (isAuthenticated || user)) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, user, router]);
 
   return (
     <main className="min-h-screen bg-white dark:bg-gray-950">
